@@ -1,59 +1,78 @@
-int PIN_RED   = 27;
-int PIN_GREEN = 26;
-int PIN_BLUE  = 25;
+
+int PIN_REL_SOLENOIDE = 27;
+int PIN_REL_VENT = 26;
+int PIN_REL_ILUM  = 25;
+int SENSOR_TEMP = 35;
+int SENSOR_HUMEDAD = 34;
+int SENSOR_LUZ = 32;
+
+int estado_previo_humedad = 0;
+int estado_previo_luz = 0;
+int estado_previo_ven = 0;
 
 void setup() {
+
+   Serial.begin(9600);
+
+  
   pinMode(5,   OUTPUT);
   pinMode(2, OUTPUT);
-  pinMode(35, OUTPUT);
-  pinMode(PIN_BLUE,  OUTPUT);
-  pinMode(PIN_GREEN,  OUTPUT);
-  pinMode(PIN_RED,  OUTPUT);
+  pinMode(PIN_REL_ILUM,  OUTPUT);
+  pinMode(PIN_REL_VENT,  OUTPUT);
+  pinMode(PIN_REL_SOLENOIDE,  OUTPUT);
+  pinMode(SENSOR_TEMP, INPUT);
+  pinMode(SENSOR_HUMEDAD, INPUT);
+  pinMode(SENSOR_LUZ, INPUT);
 
 }
 
 void loop() {
-  // color code #00C9CC (R = 0,   G = 201, B = 204)
-  //ledcWrite(PIN_RED,   0);
-  // ledcWrite(PIN_GREEN, 201);
-  // analogWrite(PIN_BLUE,  204);
-
-  digitalWrite(PIN_RED, HIGH);
-  delay(1000); // keep the color 1 second
-  digitalWrite(PIN_RED, LOW);
-  delay(1000);
-
-   digitalWrite(PIN_GREEN, HIGH);
-  delay(1000); // keep the color 1 second
-  digitalWrite(PIN_GREEN, LOW);
-  delay(1000);
-
+  if (estado_previo_ven == 0){
+    digitalWrite(PIN_REL_VENT,HIGH);
+    }
+  if (estado_previo_luz == 0){
+    digitalWrite(PIN_REL_ILUM, HIGH);
+    }
+  if (estado_previo_humedad == 0){
+    digitalWrite(PIN_REL_ILUM, HIGH);
+    }
   
-     digitalWrite(PIN_BLUE, HIGH);
-  delay(1000); // keep the color 1 second
-  digitalWrite(PIN_BLUE, LOW);
-  delay(1000);
-  
-  
-  // digitalWrite(PIN_RED, HIGH);
 
-  digitalWrite(2, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(2, LOW);    // turn the LED off by making the voltage LOW
-  delay(500);   
+  float temp = analogRead(SENSOR_TEMP);
+  float humedad = analogRead(SENSOR_HUMEDAD);
+  float luz = analogRead(SENSOR_LUZ);
 
-  // color code #F7788A (R = 247, G = 120, B = 138)
-  //ledcWrite(PIN_RED,   247);
-  //ledcWrite(PIN_GREEN, 120);
-  // analogWrite(PIN_BLUE,  138);
+  // float temp = map(((analogRead(SENSOR_TEMP) - 20) * 3.04), 0, 1023, -40, 125);
 
-//  delay(1000); // keep the color 1 second
+  // Convierte el valor a temperatura
+  temp = map(temp, 0, 1023, 0, 100);
+  humedad = map(humedad, 0,4095, 100, 0);
 
-  // color code #34A853 (R = 52,  G = 168, B = 83)
- // ledcWrite(PIN_RED,   52);
- // ledcWrite(PIN_GREEN, 168);
-  // analogWrite(PIN_BLUE,  83);
+  if (humedad < 50.00 )
+  {
+     Serial.print(humedad);
+     Serial.println("%\n");
+     digitalWrite(PIN_REL_SOLENOIDE,LOW );
+     estado_previo_humedad = 1;
+     
+   }else {
+    digitalWrite(PIN_REL_SOLENOIDE, HIGH);
+    estado_previo_humedad = 0;
+    }
+    
+   if (luz > 3000 )
+  {
+     Serial.println(luz);
 
-  // delay(1000); // keep the color 1 second
+     digitalWrite(PIN_REL_ILUM, LOW);
+     estado_previo_luz = 1;
+     
+   }else {
+    digitalWrite(PIN_REL_ILUM, HIGH);
+    estado_previo_luz = 0;
+    }
 
+  Serial.print(temp);
+  Serial.println(" grados Celsius\n");
+  delay(5000);
 }
