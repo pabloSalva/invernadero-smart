@@ -72,7 +72,15 @@ void loop() {
     estado_previo_luz = 0;
     }
 
-  Serial.print(temp);
-  Serial.println(" grados Celsius\n");
-  delay(5000);
+    if (temp > 30.00 )
+  {
+    Serial.println(temp);
+    Serial.println(" grados Celsius\n");
+    digitalWrite(PIN_REL_VENT, LOW);
+    estado_previo_ven = 1;
+     
+   }else {
+    digitalWrite(PIN_REL_VENT, HIGH);
+    estado_previo_ven = 0;
+    }
 }
